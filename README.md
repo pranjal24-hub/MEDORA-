@@ -44,17 +44,14 @@ reservations, and reservation events.
 
 ## Project Structure
 
-```text
-MEDORA-/
-├── README.md
-└── database/
-    └── schema.sql
+- `README.md`
+- `database/schema.sql`
 
-Future Development
-Emergency request module
-Hospital resource matching
-Priority-based scheduling
-Atomic resource reservation
-Web interface
-ML-based resource availability prediction
+## Future Development
 
+- Emergency request module
+- Hospital resource matching
+- Priority-based scheduling
+- Atomic resource reservation
+- Web interface
+- ML-based resource availability prediction
