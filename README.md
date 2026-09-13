@@ -49,3 +49,12 @@ MEDORA-/
 ├── README.md
 └── database/
     └── schema.sql
+
+Future Development
+Emergency request module
+Hospital resource matching
+Priority-based scheduling
+Atomic resource reservation
+Web interface
+ML-based resource availability prediction
+
