@@ -68,3 +68,51 @@
             <div class="form-group">
                 <label>Estimated A
 ```
+            <div class="form-group">
+                <label>Estimated Arrival Time (minutes)</label>
+                <input
+                    type="number"
+                    id="eta"
+                    placeholder="e.g. 12"
+                    min="1"
+                >
+            </div>
+
+        </section>
+
+        <!-- Ambulance Status -->
+        <section class="card">
+
+            <h2>Ambulance Status</h2>
+
+            <div class="form-group">
+                <label>Current Status</label>
+
+                <select id="ambulanceStatus">
+                    <option value="Ready">Ready for Emergency</option>
+                    <option value="Dispatched">Dispatched</option>
+                    <option value="On Scene">On Scene</option>
+                    <option value="Transporting">Transporting Patient</option>
+                    <option value="Available">Available</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Current Location</label>
+                <input
+                    type="text"
+                    id="location"
+                    placeholder="Enter current location"
+                >
+            </div>
+
+            <div class="form-group">
+                <label>Destination Hospital</label>
+                <input
+                    type="text"
+                    id="hospital"
+                    placeholder="Enter hospital name"
+                >
+            </div>
+
+        </section>
