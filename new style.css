@@ -135,3 +135,26 @@ button:active {
     margin: 8px 0;
     font-size: 14px;
 }
+/* Mobile Responsive Design */
+@media (max-width: 600px) {
+    header {
+        padding: 20px;
+    }
+
+    main {
+        width: 95%;
+        margin: 20px auto;
+    }
+
+    .card {
+        padding: 15px;
+    }
+
+    .button-group {
+        flex-direction: column;
+    }
+
+    button {
+        width: 100%;
+    }
+}
