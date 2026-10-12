@@ -96,3 +96,42 @@ button:hover {
     background: #b71f2d;
 }
 ```
+/* Button Layout */
+.button-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+/* Cancel Button */
+.cancel-btn {
+    background: #6c757d;
+}
+
+.cancel-btn:hover {
+    background: #565e64;
+}
+
+/* Emergency Summary */
+.summary-box {
+    background: #fff5f5;
+    border-left: 4px solid #d62839;
+    padding: 15px;
+    border-radius: 6px;
+    margin-top: 20px;
+}
+
+.summary-box h3 {
+    margin-top: 0;
+    color: #d62839;
+}
+
+.summary-box p {
+    margin: 8px 0;
+    font-size: 14px;
+}
