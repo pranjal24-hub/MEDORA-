@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Create account · MEDORA</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230E1F2B'/%3E%3Cpath d='M13 7h6v6h6v6h-6v6h-6v-6H7v-6h6z' fill='%23E4382C'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="index.html" aria-label="MEDORA home"><span class="brand-mark" aria-hidden="true"></span>MEDORA</a>
+  <nav><a class="btn ghost" href="login.html" id="to-login">Sign in</a></nav>
+</header>
+<main class="authpage">
+  <section class="authcard wide">
+    <h1>Create an account</h1>
+    <p class="muted">Register an ambulance or a hospital. You are signed in as soon as it is created.</p>
+
+  <form id="signup-form" autocomplete="off">
+    
+    <div class="seg two" role="tablist" aria-label="Account type">
+      <button type="button" role="tab" data-role="ambulance" aria-selected="true">Ambulance</button>
+      <button type="button" role="tab" data-role="hospital" aria-selected="false">Hospital</button>
+    </div>
+    <div class="grid2">
+      <label class="field">Username<input id="s-user" required minlength="3" maxlength="30" placeholder="e.g. amb-clocktower" autocapitalize="none"><small id="s-user-note" class="muted"></small></label>
+      <label class="field">Password<input id="s-pass" type="password" required minlength="8" maxlength="72" placeholder="8+ characters, a letter and a number" autocomplete="new-password"></label>
+    </div>
+
+    <div id="s-amb" class="grid2">
+      <label class="field">Base or station name<input id="sa-base" required minlength="2" maxlength="80" placeholder="e.g. Clock Tower station"></label>
+      <label class="field">Vehicle number (optional)<input id="sa-plate" maxlength="20" placeholder="UK07 AB 1234"></label>
+    </div>
+
+    <div id="s-hosp" class="grid2" hidden>
+      <label class="field span2">Hospital name<input id="sh-name" minlength="3" maxlength="120" placeholder="e.g. City Care Hospital"></label>
+      <label class="field">Type<select id="sh-own"><option value="private">Private</option><option value="government">Government</option></select></label>
+      <label class="field">Emergency phone<input id="sh-ephone" type="tel" maxlength="30" placeholder="Optional"></label>
+      <label class="field span2">Address<input id="sh-addr" maxlength="200" placeholder="Optional"></label>
+      <fieldset class="span2 counts">
+        <legend>How many do you have in total?</legend>
+        <label class="mini">Emergency beds<input id="sh-er" type="number" min="0" max="500" value="5"></label>
+        <label class="mini">ICU beds<input id="sh-icu" type="number" min="0" max="500" value="2"></label>
+        <label class="mini">Ventilators<input id="sh-vent" type="number" min="0" max="500" value="1"></label>
+        <label class="mini">Operation theatres<input id="sh-ot" type="number" min="0" max="100" value="1"></label>
+      </fieldset>
+      <fieldset class="span2">
+        <legend>Services</legend>
+        <div class="chips" id="sh-svc">
+          <label class="chip"><input type="checkbox" value="Trauma"><span>Trauma</span></label>
+          <label class="chip"><input type="checkbox" value="Neurosurgery"><span>Neurosurgery</span></label>
+          <label class="chip"><input type="checkbox" value="Orthopaedics"><span>Orthopaedics</span></label>
+          <label class="chip"><input type="checkbox" value="Cardiology"><span>Cardiology</span></label>
+          <label class="chip"><input type="checkbox" value="Paediatrics"><span>Paediatrics</span></label>
+        </div>
+      </fieldset>
+      <label class="switch"><input type="checkbox" id="sh-24" checked><span>Emergency open 24×7</span></label>
+      <label class="switch"><input type="checkbox" id="sh-trauma"><span>Trauma centre</span></label>
+    </div>
+
+    <fieldset class="loc">
+      <legend id="s-loc-t">Where is the base?</legend>
+      <div class="grid2">
+        <label class="field">City<select id="s-city"><option>Dehradun</option><option>Haridwar</option><option>Rishikesh</option><option>Roorkee</option></select></label>
+        <div class="field">Location<button type="button" class="btn ghost" id="s-gps">Use my current location</button></div>
+      </div>
+      <p id="s-loc" class="muted small-t"></p>
+      <details><summary class="small-t">Enter coordinates by hand</summary>
+        <div class="grid2"><label class="mini">Latitude<input id="s-lat" type="number" step="any" min="-90" max="90"></label><label class="mini">Longitude<input id="s-lon" type="number" step="any" min="-180" max="180"></label></div>
+      </details>
+    </fieldset>
+    <p class="muted small-t" id="s-note"></p>
+    <p id="s-err" class="err" role="alert" hidden></p>
+    <div class="row">
+      <button class="btn signal big" id="s-go" type="submit">Create account</button>
+      <a class="btn ghost" href="index.html">Back</a>
+    </div>
+  </form>
+
+  </section>
+</main>
+<script src="config.js"></script>
+<script src="auth.js"></script>
+<script>
+(() => {
+  const { api, session, saveSession, params, home } = MedoraAuth;
+  const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+  if (session && session.token) { home(session.role); return; }
+  const CITY_XY = { Dehradun: [30.3165, 78.0322], Haridwar: [29.9457, 78.1642], Rishikesh: [30.0869, 78.2676], Roorkee: [29.8543, 77.8880] };
+  const SU = { role: 'ambulance', custom: false, t: 0, chk: 0 };
+  const note = (el, t, cls) => { el.textContent = t; el.className = cls || 'muted'; };
+  function setLoc(lat, lon, text) { $('#s-lat').value = (+lat).toFixed(5); $('#s-lon').value = (+lon).toFixed(5); $('#s-loc').textContent = text; }
+  function cityLoc() { if (!SU.custom) { const [la, lo] = CITY_XY[$('#s-city').value]; setLoc(la, lo, 'Using the centre of ' + $('#s-city').value + '. Tap “Use my current location” for an exact spot.'); } }
+  function setRole(role) {
+    SU.role = role;
+    $$('.seg button').forEach(b => b.setAttribute('aria-selected', b.dataset.role === role));
+    $('#s-amb').hidden = role !== 'ambulance'; $('#s-hosp').hidden = role !== 'hospital';
+    $('#sa-base').required = role === 'ambulance'; $('#sh-name').required = role === 'hospital';
+    $('#s-loc-t').textContent = role === 'ambulance' ? 'Where is the ambulance based?' : 'Where is the hospital?';
+    $('#s-user').placeholder = role === 'ambulance' ? 'e.g. amb-clocktower' : 'e.g. hosp-citycare';
+    $('#s-note').textContent = role === 'ambulance'
+      ? 'Your ambulance shows on the map at this base and is sent to accidents when it is the nearest free one. It will share its live GPS automatically.'
+      : 'You will be asked to confirm your real beds when you sign in, and every 15 minutes after. New hospitals are marked unverified until checked.';
+    $('#to-login').href = 'login.html?role=' + role;
+  }
+  $$('.seg button').forEach(b => b.onclick = () => setRole(b.dataset.role));
+  $('#s-city').onchange = () => { SU.custom = false; cityLoc(); };
+  $('#s-lat').oninput = $('#s-lon').oninput = () => { SU.custom = true; $('#s-loc').textContent = 'Using the coordinates you entered.'; };
+  $('#s-gps').onclick = () => {
+    if (!navigator.geolocation) return alert('This browser cannot share location. Pick the city instead.');
+    navigator.geolocation.getCurrentPosition(p => { SU.custom = true; setLoc(p.coords.latitude, p.coords.longitude, 'Using your current location.'); },
+      () => alert('Location is blocked. Allow it in the browser, or pick the city.'), { enableHighAccuracy: true, timeout: 8000 });
+  };
+  $('#s-user').oninput = () => {
+    const n = $('#s-user-note'), u = $('#s-user').value.trim().toLowerCase(), id = ++SU.t; note(n, '');
+    if (!u) return;
+    if (!/^[a-z0-9][a-z0-9_-]{2,29}$/.test(u)) return note(n, '3 to 30 characters: a-z, 0-9, - or _', 'bad');
+    clearTimeout(SU.chk);
+    SU.chk = setTimeout(async () => { try { const r = await api('/signup/check?username=' + encodeURIComponent(u)); if (id === SU.t) note(n, r.free ? 'Available' : 'Already taken', r.free ? 'good' : 'bad'); } catch (e) { } }, 350);
+  };
+  $('#signup-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = $('#s-go'), err = $('#s-err'); err.hidden = true; btn.disabled = true;
+    const base = { username: $('#s-user').value.trim().toLowerCase(), password: $('#s-pass').value, city: $('#s-city').value, lat: +$('#s-lat').value, lon: +$('#s-lon').value };
+    let body;
+    if (SU.role === 'ambulance') body = { ...base, base_name: $('#sa-base').value.trim(), plate: $('#sa-plate').value.trim() || null };
+    else body = { ...base, name: $('#sh-name').value.trim(), ownership: $('#sh-own').value, emergency_phone: $('#sh-ephone').value.trim() || null,
+      phone: $('#sh-ephone').value.trim() || null, address: $('#sh-addr').value.trim() || null, emergency_24x7: $('#sh-24').checked, trauma_centre: $('#sh-trauma').checked,
+      er_beds: +$('#sh-er').value || 0, icu_beds: +$('#sh-icu').value || 0, ventilators: +$('#sh-vent').value || 0, ot: +$('#sh-ot').value || 0,
+      services: $$('#sh-svc input:checked').map(i => i.value) };
+    try {
+      const r = await api('/signup/' + SU.role, { method: 'POST', body });
+      saveSession({ token: r.token, role: r.role, username: base.username });
+      home(r.role);
+    } catch (ex) { err.textContent = ex.message; err.hidden = false; btn.disabled = false; }
+  });
+  const want = params.get('role') === 'hospital' ? 'hospital' : 'ambulance';
+  setRole(want); cityLoc();
+})();
+</script>
+</body>
+</html>
