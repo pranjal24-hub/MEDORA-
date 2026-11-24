@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+websockets
+psycopg2-binary
+python-dotenv
+pydantic
+PyJWT
+scikit-learn
+numpy

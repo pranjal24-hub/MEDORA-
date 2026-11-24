@@ -1,0 +1,17 @@
+# secrets
+.env
+
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# compiled C++
+*.exe
+
+# VS Code / OS
+.vscode/
+.DS_Store
+Thumbs.db
+backend/app/ml/models/
+__pycache__/
