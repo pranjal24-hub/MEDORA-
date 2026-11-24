@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MEDORA</title>
+<meta name="description" content="Emergency bed booking that connects ambulances and hospitals across Dehradun, Haridwar, Rishikesh and Roorkee.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230E1F2B'/%3E%3Cpath d='M13 7h6v6h6v6h-6v6h-6v-6H7v-6h6z' fill='%23E4382C'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="top">
+  <a class="brand" href="#/" aria-label="MEDORA home"><span class="brand-mark" aria-hidden="true"></span>MEDORA</a>
+  <nav id="nav" aria-label="Main">
+    <a href="#how" class="nav-landing">How it works</a>
+    <a href="#report" class="nav-landing">Report an accident</a>
+    <span id="live" class="live" hidden title="Live connection"><i></i><span>Live</span></span>
+    <span id="who" class="who" hidden></span>
+    <a href="#/ambulance" id="nav-dash" class="nav-dash" hidden>Dashboard</a>
+    <button class="btn ghost" id="btn-logout" hidden>Sign out</button>
+    <button class="btn ghost" id="btn-login-amb">Ambulance login</button>
+    <button class="btn ghost" id="btn-login-hosp">Hospital login</button>
+    <button class="btn dark" id="btn-signup">Sign up</button>
+  </nav>
+</header>
+
+<main>
+<!-- ===================== LANDING ===================== -->
+<div id="view-landing">
+  <section class="hero">
+    <div class="hero-copy">
+      <h1>The hospital is ready before the ambulance arrives.</h1>
+      <p class="lead">MEDORA links ambulances and emergency rooms across Dehradun, Haridwar, Rishikesh and Roorkee. The moment an accident is reported, nearby hospitals are alerted and a bed is held for the patient.</p>
+      <div class="cta-row">
+        <a class="btn signal big" href="#report">Report an accident</a>
+        <button class="btn ghost big" data-login="ambulance">Ambulance login</button>
+        <button class="btn ghost big" data-login="hospital">Hospital login</button>
+      </div>
+      <p class="muted small-t join">New here? <button class="linkbtn" data-signup="ambulance">Register an ambulance</button> or <button class="linkbtn" data-signup="hospital">Register a hospital</button></p>
+      <dl class="facts">
+        <div><dt id="f-h">22</dt><dd>hospitals in four cities</dd></div>
+        <div><dt>1 step</dt><dd>to hold a bed. Two ambulances can never hold the same one.</dd></div>
+        <div><dt>No typing</dt><dd>the paramedic says the place and taps the rest</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="how" id="how">
+    <h2>What happens in the first minutes</h2>
+    <ol class="steps">
+      <li><h3>Accident reported</h3><p>A citizen or police officer reports it through MEDORA, or the ambulance crew says the location out loud.</p></li>
+      <li><h3>Hospitals are alerted</h3><p>Every emergency-ready hospital within 40 km sees the ambulance coming, along with how long it will take.</p></li>
+      <li><h3>Paramedic reports</h3><p>One tap for severity, then ICU, ventilator or surgery if needed. No typing.</p></li>
+      <li><h3>Best match is booked</h3><p>Travel time, hospital load and free beds are weighed together. The bed is held in a single step that no other ambulance can take.</p></li>
+      <li><h3>Route and live location</h3><p>The road route is drawn on the same page. The hospital watches the ambulance arrive live and frees the bed after surgery or discharge.</p></li>
+    </ol>
+  </section>
+
+  <section class="report" id="report">
+    <div class="report-copy">
+      <h2>Report an accident</h2>
+      <p>Share where it happened. The nearest free ambulance is sent and hospitals are alerted straight away.</p>
+      <div class="row">
+        <button class="btn dark" id="r-gps">Use my location</button>
+      </div>
+      <div class="spots" id="r-spots" aria-label="Quick places"></div>
+      <label class="field">Or search a place
+        <span class="inline"><input id="r-q" type="search" placeholder="e.g. Clock Tower, Dehradun" autocomplete="off"><button class="btn ghost" id="r-search">Find</button></span>
+      </label>
+      <p id="r-picked" class="picked" aria-live="polite">Nothing selected yet. You can also tap the map.</p>
+      <button class="btn signal big" id="r-send" disabled>Send alert</button>
+      <div id="r-result" class="result" hidden aria-live="polite"></div>
+    </div>
+    <div id="r-map" class="map"></div>
+  </section>
+
+</div>
+
+<!-- ===================== AMBULANCE ===================== -->
+<div id="view-ambulance" hidden>
+  <div class="dash">
+    <div class="panel-col">
+      <div class="bar">
+        <div><h2 id="a-code">AMB</h2><p id="a-base" class="muted"></p></div>
+        <span id="a-status" class="badge">—</span>
+      </div>
+
+      <div class="row wrap tools">
+        <div class="gps wait" id="a-gps-state" role="status"><i></i><span>Getting GPS…</span><button type="button" class="linkbtn" id="a-gps-retry" hidden>Retry</button></div>
+        <label class="mini">Demo speed
+          <select id="a-speed"><option value="1">1× real</option><option value="5">5×</option><option value="10" selected>10×</option><option value="20">20×</option></select>
+        </label>
+      </div>
+
+      <p id="a-gps-banner" class="err" role="alert" hidden></p>
+
+      <div id="a-idle">
+        <h3>New accident</h3>
+        <p class="muted">Press the microphone and say where it happened. What you say is final.</p>
+        <button id="a-mic" class="mic" aria-label="Speak the accident location"><span class="mic-dot"></span><span id="a-mic-t">Speak location</span></button>
+        <div class="row">
+          <label class="mini">Language
+            <select id="a-lang"><option value="hi-IN">Hindi</option><option value="en-IN">English</option></select>
+          </label>
+        </div>
+        <div class="spots" id="a-spots" aria-label="Quick places"></div>
+        <label class="field">Or type it
+          <span class="inline"><input id="a-q" type="text" placeholder="Place name" autocomplete="off"><button class="btn ghost" id="a-find">Find</button></span>
+        </label>
+        <div id="a-pending" class="pending" hidden></div>
+      </div>
+
+      <div id="a-case" hidden>
+        <div class="case-head">
+          <div><h3 id="c-title">Accident</h3><p id="c-sub" class="muted"></p></div>
+          <button class="btn ghost small" id="c-cancel">Cancel case</button>
+        </div>
+        <p id="a-prov" class="route-info" hidden></p>
+        <p id="c-route-info" class="route-info" aria-live="polite"></p>
+        <div class="row wrap">
+          <button class="btn dark" id="c-drive-scene">Simulate drive to accident</button>
+        </div>
+        <p id="c-live" class="muted"></p>
+
+      </div>
+
+      <div id="a-booked" hidden>
+        <div class="booked">
+          <p class="muted">Bed held at</p>
+          <h3 id="b-name"></h3>
+          <p id="b-meta" class="muted"></p>
+          <div class="chips static" id="b-items"></div>
+        </div>
+        <p id="b-route-info" class="route-info" aria-live="polite"></p>
+        <div class="row wrap">
+          <button class="btn signal big" id="b-drive">Simulate drive to hospital</button>
+          <a class="btn ghost" id="b-call">Call hospital</a>
+        </div>
+        <div class="row wrap">
+          <button class="btn dark" id="b-arrived">Arrived at hospital</button>
+          <button class="btn ghost" id="b-cancel">Cancel case</button>
+        </div>
+        <p id="b-live" class="muted"></p>
+      </div>
+
+      <div id="a-form-wrap" hidden>
+        <form id="a-form" class="assess" autocomplete="off">
+          <div id="ml-box" class="mlbox" hidden aria-live="polite"></div>
+          <fieldset>
+            <legend>How serious is it?</legend>
+            <div class="sev">
+              <label class="sev-opt crit"><input type="radio" name="sev" value="CRITICAL"><span><b>Critical</b>Life at risk now</span></label>
+              <label class="sev-opt mod"><input type="radio" name="sev" value="MODERATE"><span><b>Moderate</b>Serious, stable</span></label>
+              <label class="sev-opt low"><input type="radio" name="sev" value="LOW"><span><b>Low</b>Walking wounded</span></label>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>Patients</legend>
+            <div class="stepper"><button type="button" id="p-minus" aria-label="Fewer patients">−</button><output id="p-n">1</output><button type="button" id="p-plus" aria-label="More patients">+</button></div>
+          </fieldset>
+          <fieldset>
+            <legend>Needs</legend>
+            <div class="chips" id="needs">
+              <label class="chip"><input type="checkbox" name="need" value="icu"><span>ICU bed</span></label>
+              <label class="chip"><input type="checkbox" name="need" value="ventilator"><span>Ventilator</span></label>
+              <label class="chip"><input type="checkbox" name="need" value="surgery"><span>Surgery</span></label>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>Injury type</legend>
+            <div class="chips" id="spec">
+              <label class="chip"><input type="checkbox" name="spec" value="Trauma"><span>Trauma</span></label>
+              <label class="chip"><input type="checkbox" name="spec" value="Neurosurgery"><span>Head or spine</span></label>
+              <label class="chip"><input type="checkbox" name="spec" value="Orthopaedics"><span>Bones</span></label>
+              <label class="chip"><input type="checkbox" name="spec" value="Cardiology"><span>Heart</span></label>
+              <label class="chip"><input type="checkbox" name="spec" value="Paediatrics"><span>Child</span></label>
+            </div>
+          </fieldset>
+          <details class="vitals" open>
+            <summary>Vitals and red flags (optional, the more you add the better the suggestion)</summary>
+            <div class="row wrap">
+              <label class="mini">Age<input type="number" id="v-age" min="0" max="120" inputmode="numeric"></label>
+              <label class="mini">Breaths /min<input type="number" id="v-rr" min="0" max="100" inputmode="numeric"></label>
+              <label class="mini">Systolic BP<input type="number" id="v-sbp" min="0" max="300" inputmode="numeric"></label>
+              <label class="mini">Pulse<input type="number" id="v-hr" min="0" max="250" inputmode="numeric"></label>
+              <label class="mini">SpO₂ %<input type="number" id="v-spo2" min="0" max="100" inputmode="numeric"></label>
+              <label class="mini">GCS (3–15)<input type="number" id="v-gcs" min="3" max="15" inputmode="numeric"></label>
+              <label class="mini">Cause<input type="text" id="v-mech" placeholder="e.g. bike and truck"></label>
+            </div>
+            <div class="chips flags" id="flags">
+              <label class="chip"><input type="checkbox" name="flag" value="walking"><span>Can walk</span></label>
+              <label class="chip"><input type="checkbox" name="flag" value="no_obey"><span>Cannot follow commands</span></label>
+              <label class="chip"><input type="checkbox" name="flag" value="penetrating"><span>Penetrating wound</span></label>
+              <label class="chip"><input type="checkbox" name="flag" value="pelvis"><span>Pelvis fracture</span></label>
+              <label class="chip"><input type="checkbox" name="flag" value="flail"><span>Unstable chest</span></label>
+              <label class="chip"><input type="checkbox" name="flag" value="crush_amput"><span>Crushed or cut limb</span></label>
+              <label class="chip"><input type="checkbox" name="flag" value="bleed"><span>Heavy bleeding</span></label>
+              <label class="chip"><input type="checkbox" name="flag" value="high_mech"><span>Severe crash or fall</span></label>
+            </div>
+          </details>
+          <div class="row wrap">
+            <button class="btn signal big" id="a-go" type="submit">Send report and book best hospital</button>
+            <button class="btn ghost" id="a-options" type="button">Show options first</button>
+          </div>
+          <p id="a-err" class="err" role="alert" hidden></p>
+        </form>
+
+        <div id="a-opts" hidden>
+          <h3>Hospitals that can take the patient</h3>
+          <ul class="opts" id="a-opts-list"></ul>
+        </div>
+      </div>
+
+      <section class="prev" aria-label="Previous cases">
+        <h3>Previous cases</h3>
+        <p class="muted small-t">Last 5 cases. Tap a row to see its timeline.</p>
+        <div id="a-prev"><p class="muted small-t">Loading…</p></div>
+      </section>
+    </div>
+    <div class="map-col"><div id="a-map" class="map tall"></div><p class="map-note legend"><span><i class="lg hosp"></i>Hospital</span><span><i class="lg base"></i>Ambulance base</span><span><i class="lg amb"></i>Live ambulance</span><span><i class="lg scene"></i>Accident</span></p><p class="map-note">Road route from OpenStreetMap routing (no live traffic). The map follows your ambulance while you drive.</p></div>
+  </div>
+</div>
+
+<!-- ===================== HOSPITAL ===================== -->
+<div id="view-hospital" hidden>
+  <div class="dash">
+    <div class="panel-col">
+      <div class="bar">
+        <div><h2 id="h-name">Hospital</h2><p id="h-city" class="muted"></p></div>
+        <div class="count"><b id="h-count">0</b><span>ambulances coming</span></div>
+      </div>
+      <div id="h-alert" class="alert" hidden role="status"></div>
+      <div class="upd" id="h-upd"><span id="h-upd-t">Beds not confirmed yet</span><button type="button" class="btn dark small" id="h-upd-btn">Update beds now</button></div>
+
+      <h3>Coming to you</h3>
+      <ul class="incoming" id="h-in"><li class="empty">No ambulance is heading here right now.</li></ul>
+
+      <h3>Your beds and equipment</h3>
+      <ul class="res" id="h-res"></ul>
+      <p class="muted small-t">Set how many are free right now. Beds held for ambulances are kept separate.</p>
+      <details class="hist"><summary class="small-t">Update history</summary><ul id="h-hist" class="small-t"></ul></details>
+
+      <h3>Situation</h3>
+      <div class="seg" id="h-load" role="radiogroup" aria-label="How busy is the hospital">
+        <button type="button" data-load="NORMAL">Normal</button>
+        <button type="button" data-load="BUSY">Busy</button>
+        <button type="button" data-load="OVERLOADED">Overloaded</button>
+      </div>
+      <label class="switch"><input type="checkbox" id="h-div"><span>Not taking new emergencies</span></label>
+
+      <h3>Booked and admitted</h3>
+      <ul class="resv" id="h-resv"><li class="empty">Nothing booked.</li></ul>
+
+      <section class="prev" aria-label="Previous cases">
+        <h3>Previous cases</h3>
+        <p class="muted small-t">Last 5 closed cases. Tap a row to see its timeline.</p>
+        <div id="h-prev"><p class="muted small-t">Loading…</p></div>
+      </section>
+    </div>
+    <div class="map-col"><div id="h-map" class="map tall"></div><p class="map-note legend"><span><i class="lg hosp"></i>Hospital</span><span><i class="lg base"></i>Ambulance base</span><span><i class="lg amb"></i>Live ambulance</span><span><i class="lg scene"></i>Accident</span></p><p class="map-note">Ambulance positions are pushed live over WebSocket. No refresh needed.</p></div>
+  </div>
+</div>
+</main>
+
+<dialog id="confirm" class="wide">
+  <form method="dialog" id="confirm-form" autocomplete="off">
+    <h2 id="cf-title">Confirm your beds</h2>
+    <p id="cf-why" class="muted"></p>
+    <div id="cf-rows"></div>
+    <p class="muted small-t">Enter the real numbers. Ambulances choose a hospital using these, so wrong numbers can send a patient to a full ER.</p>
+    <p id="cf-err" class="err" role="alert" hidden></p>
+    <div class="row">
+      <button class="btn signal" id="cf-go" value="go">Confirm</button>
+      <button class="btn ghost" id="cf-later" value="cancel" formnovalidate>Later</button>
+    </div>
+  </form>
+</dialog>
+
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
